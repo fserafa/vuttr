@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Typography, Container, Box, Button, Input, TextField, CircularProgress, Grid, Checkbox, FormControlLabel } from '@material-ui/core';
 import api from '../services/api';
-import Ferramenta from '../components/Ferramenta'
+import Tool from '../components/Tool'
 import ModalAdd from '../components/ModalAdd';
 import { makeStyles } from '@material-ui/core/styles';
 import { Search, Add } from '@material-ui/icons';
@@ -19,28 +19,36 @@ const useStyles = makeStyles({
 });
 
 export default function Index() {
-    const [ferramentas, setFerramentas] = useState([]);
+    const [tools, setTools] = useState([]);
     const [reload, setReload] = useState(false)
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(true);
     const [tagsOnly, setTagsOnly] = useState(false);
+    const [search, setSearch] = useState(false);
+    const [searchResults, setSearchResults] = useState([]);
+    const [term, setTerm] = useState('');
 
     const styles = useStyles();
 
     useEffect(() => {
         async function getData() {
             setLoading(true);
-            const response = await api.get('/ferramentas');
-            setFerramentas(response.data);
+            const response = await api.get('/tools');
+            setTools(response.data);
             setLoading(false);
         }
 
         getData();
     }, [reload])
 
-    async function handleAdd(ferramenta) {
+    useEffect(() => {
+        handleSearch(term)
+    }, [tools])
+
+    async function handleAdd(tool) {
+        handleClose();
         setLoading(true);
-        await api.post(`/ferramentas/`, ferramenta);
+        await api.post(`/tools/`, tool);
         handleClose();
         setReload(reload => (!reload));
         setLoading(false);
@@ -48,10 +56,31 @@ export default function Index() {
 
     async function handleDelete(id) {
         setLoading(true);
-        await api.delete(`/ferramentas/${id}`);
+        await api.delete(`/tools/${id}`);
         setReload(reload => (!reload));
         setLoading(false);
+    }
 
+    function handleSearch(term) {
+        setTerm(term)
+        if (term === '') { return setSearch(false); }
+
+        setSearch(true);
+        let results = [];
+        if (!tagsOnly) {
+            results = tools.filter(tool => (
+                (tool.name.toLowerCase().includes(term.toLowerCase())) ||
+                (tool.description.toLowerCase().includes(term.toLowerCase()))
+            ))
+        }
+        else {
+            tools.map(tool => {
+                if (tool.tags.join(' ').toLowerCase().includes(term.toLowerCase())) {
+                    results = [...results, tool]
+                }
+            })
+        }
+        setSearchResults(results);
     }
 
     function handleClose() {
@@ -59,32 +88,32 @@ export default function Index() {
     }
 
     return (
-        <Container>
+        <Container style={{ display: 'flex', alignContent: 'center', justifyContent: 'center', flexDirection: 'column' }}>
             <Typography variant="h3">VUTTR</Typography>
             <Typography variant="h4">Very Useful Tools To Remember</Typography>
             <Box display="flex" justifyContent="center">
                 {loading && <CircularProgress />}
             </Box>
 
-            <Box display='flex' justifyContent="space-between">
+            <Box display='flex' justifyContent="space-between" mt="40px" mb="40px">
                 <Grid container spacing={1} alignItems="flex-end">
                     <Grid item>
                         <Search />
                     </Grid>
                     <Grid item>
-                        <TextField label="Search" />
+                        <TextField label="Search" onChange={e => handleSearch(e.target.value)} />
                     </Grid>
-                
-                <FormControlLabel
-                    control={
-                        <Checkbox
-                            checked={tagsOnly}
-                            onChange={e => setTagsOnly(e.target.checked)}
-                            value="tagsOnly" 
-                            color="primary"/>
-                    }
-                    label="search in tags only"
-                />
+
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={tagsOnly}
+                                onChange={e => setTagsOnly(e.target.checked)}
+                                value="tagsOnly"
+                                color="primary" />
+                        }
+                        label="search in tags only"
+                    />
                 </Grid>
                 <Button
                     onClick={() => setOpen(true)}
@@ -98,13 +127,14 @@ export default function Index() {
 
             <ModalAdd open={open} handleClose={handleClose} handleAdd={handleAdd} />
 
-            {
-                ferramentas.map((item) => (
-                    <Ferramenta key={item.id} ferramenta={item} handleDelete={handleDelete} s />
+            {!search ?
+                tools.map((item) => (
+                    <Tool key={item.id} tool={item} handleDelete={handleDelete} />
+                )) :
+                searchResults.map((item, index) => (
+                    <Tool key={index.toString()} tool={item} handleDelete={handleDelete} />
                 ))
             }
-
-
         </Container >
     )
 }

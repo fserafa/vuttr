@@ -10,27 +10,26 @@ const useStyles = makeStyles({
     },
 });
 
-export default function Ferramenta(props) {
+export default function Tool(props) {
     const styles = useStyles();
-    const { ferramenta, handleDelete } = props;
+    const { tool, handleDelete } = props;
 
     return (
         <Card className={styles.card}>
-            <Box display="flex" justifyContent="space-between" alignItems="center">
-                <a href={ferramenta.link}><Typography variant="h4">{ferramenta.name}</Typography></a>
+            <Box display="flex" justifyContent="space-between" alignItems="center" mb="20px">
+                <a href={tool.link}><Typography variant="h4">{tool.name}</Typography></a>
                 <Button
-                    onClick={() => handleDelete(ferramenta.id)}
+                    onClick={() => handleDelete(tool.id)}
                     variant="contained"
                     color="secondary"
                     startIcon={<Delete />}
                 >
-                    <span>Delete</span>
+                    <span>Remove</span>
                 </Button>
             </Box>
-            <Typography variant="h4">{ferramenta.link}</Typography>
-            <Typography variant="body1">{ferramenta.description}</Typography>
-            <Typography variant="body1">
-                {ferramenta.tags.map((tag, index) => <span key={index}>#{tag} </span>)}
+            <Typography variant="body1" style={{ marginBottom: 20 }}>{tool.description}</Typography>
+            <Typography variant="body1" style={{ fontWeight: 'bold' }}>
+                {tool.tags.map((tag, index) => <span key={index}>#{tag} </span>)}
             </Typography>
         </Card>
     )
