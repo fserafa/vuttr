@@ -1,34 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { Typography, Container, Box, Button, Input, TextField, CircularProgress, Grid, Checkbox, FormControlLabel } from '@material-ui/core';
+import { Typography, Container, Box, Button, Input, TextField, CircularProgress, Grid, Checkbox, FormControlLabel, InputAdornment } from '@material-ui/core';
 import api from '../services/api';
 import Tool from '../components/Tool'
 import ModalAdd from '../components/ModalAdd';
-import { makeStyles } from '@material-ui/core/styles';
 import { Search, Add } from '@material-ui/icons';
+import ModalRemove from '../components/ModalRemove';
 
-const useStyles = makeStyles({
-    root: {
-        background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)',
-        border: 0,
-        borderRadius: 3,
-        boxShadow: '0 3px 5px 2px rgba(255, 105, 135, .3)',
-        color: 'white',
-        height: 48,
-        padding: '0 30px',
-    },
-});
+
 
 export default function Index() {
     const [tools, setTools] = useState([]);
     const [reload, setReload] = useState(false)
-    const [open, setOpen] = useState(false);
+    const [openAdd, setOpenAdd] = useState(false);
+    const [openRemove, setOpenRemove] = useState(false);
     const [loading, setLoading] = useState(true);
     const [tagsOnly, setTagsOnly] = useState(false);
     const [search, setSearch] = useState(false);
     const [searchResults, setSearchResults] = useState([]);
     const [term, setTerm] = useState('');
-
-    const styles = useStyles();
+    const [tool, setTool] = useState('');
 
     useEffect(() => {
         async function getData() {
@@ -46,18 +36,18 @@ export default function Index() {
     }, [tools])
 
     async function handleAdd(tool) {
-        handleClose();
         setLoading(true);
         await api.post(`/tools/`, tool);
-        handleClose();
         setReload(reload => (!reload));
+        handleCloseAdd();
         setLoading(false);
     }
 
-    async function handleDelete(id) {
+    async function handleRemove(id) {
         setLoading(true);
         await api.delete(`/tools/${id}`);
         setReload(reload => (!reload));
+        handleCloseRemove();
         setLoading(false);
     }
 
@@ -83,8 +73,17 @@ export default function Index() {
         setSearchResults(results);
     }
 
-    function handleClose() {
-        setOpen(false);
+    function handleOpenRemove(tool) {
+        setTool(tool);
+        setOpenRemove(true);
+    }
+
+    function handleCloseAdd() {
+        setOpenAdd(false);
+    }
+
+    function handleCloseRemove() {
+        setOpenRemove(false);
     }
 
     return (
@@ -96,14 +95,16 @@ export default function Index() {
             </Box>
 
             <Box display='flex' justifyContent="space-between" mt="40px" mb="40px">
-                <Grid container spacing={1} alignItems="flex-end">
-                    <Grid item>
-                        <Search />
-                    </Grid>
-                    <Grid item>
-                        <TextField label="Search" onChange={e => handleSearch(e.target.value)} />
-                    </Grid>
-
+                <Grid container spacing={1} alignItems="center">
+                    <TextField
+                        label="Search"
+                        onChange={e => handleSearch(e.target.value)}
+                        InputProps={{
+                            startAdornment: <InputAdornment position="start"><Search /></InputAdornment>
+                        }}
+                        variant="outlined"
+                        style={{ marginRight: 10 }}
+                    />
                     <FormControlLabel
                         control={
                             <Checkbox
@@ -116,7 +117,7 @@ export default function Index() {
                     />
                 </Grid>
                 <Button
-                    onClick={() => setOpen(true)}
+                    onClick={() => setOpenAdd(true)}
                     variant="contained"
                     color="primary"
                     startIcon={<Add />}
@@ -125,14 +126,15 @@ export default function Index() {
                 </Button>
             </Box>
 
-            <ModalAdd open={open} handleClose={handleClose} handleAdd={handleAdd} />
+            <ModalAdd open={openAdd} handleCloseAdd={handleCloseAdd} handleAdd={handleAdd} />
+            <ModalRemove open={openRemove} handleCloseRemove={handleCloseRemove} tool={tool} handleRemove={handleRemove} />
 
             {!search ?
                 tools.map((item) => (
-                    <Tool key={item.id} tool={item} handleDelete={handleDelete} />
+                    <Tool key={item.id} tool={item} handleOpenRemove={handleOpenRemove} />
                 )) :
                 searchResults.map((item, index) => (
-                    <Tool key={index.toString()} tool={item} handleDelete={handleDelete} />
+                    <Tool key={index.toString()} tool={item} handleOpenRemove={handleOpenRemove} />
                 ))
             }
         </Container >

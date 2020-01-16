@@ -12,14 +12,14 @@ const useStyles = makeStyles({
 
 export default function Tool(props) {
     const styles = useStyles();
-    const { tool, handleDelete } = props;
+    const { tool, handleOpenRemove } = props;
 
     return (
         <Card className={styles.card}>
             <Box display="flex" justifyContent="space-between" alignItems="center" mb="20px">
                 <a href={tool.link}><Typography variant="h4">{tool.name}</Typography></a>
                 <Button
-                    onClick={() => handleDelete(tool.id)}
+                    onClick={() => handleOpenRemove(tool)}
                     variant="contained"
                     color="secondary"
                     startIcon={<Delete />}
@@ -29,7 +29,9 @@ export default function Tool(props) {
             </Box>
             <Typography variant="body1" style={{ marginBottom: 20 }}>{tool.description}</Typography>
             <Typography variant="body1" style={{ fontWeight: 'bold' }}>
-                {tool.tags.map((tag, index) => <span key={index}>#{tag} </span>)}
+                #{tool.tags.join(' #')}
+
+                {/* {tool.tags.map((tag, index) => <span key={index}>#{tag} </span>)} */}
             </Typography>
         </Card>
     )
