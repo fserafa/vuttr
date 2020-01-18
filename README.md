@@ -2,9 +2,9 @@
 
 ##  Print Screens
 <p float="left">
-  <img src="https://github.com/fserafa/vuttr/blob/master/screens/01.png" width="600" />
-  <img src="https://github.com/fserafa/vuttr/blob/master/screens/02.png" width="600" /> 
-  <img src="https://github.com/fserafa/vuttr/blob/master/screens/03.png" width="600" /> 
+  <img src="https://github.com/fserafa/vuttr/blob/master/screens/01.png" width="1200" />
+  <img src="https://github.com/fserafa/vuttr/blob/master/screens/02.png" width="1200" /> 
+  <img src="https://github.com/fserafa/vuttr/blob/master/screens/03.png" width="1200" /> 
 </p>
 
 ##  Live demo
