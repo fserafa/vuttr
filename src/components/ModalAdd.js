@@ -47,7 +47,11 @@ export default function ModalAdd(props) {
     function handleSubmit(e) {
         e.preventDefault();
 
-        if (error.status) return;
+        if (error.status) {
+            setError({ status: true, message: 'Link must start with http or https' })
+            return;
+        }
+
 
         const _tool = { ...tool };
         _tool.tags = _tool.tags.split(' ');
@@ -62,12 +66,22 @@ export default function ModalAdd(props) {
 
         handleAdd(_tool);
     }
+    function handleClose() {
+        setTool({
+            name: '',
+            link: '',
+            description: '',
+            tags: ''
+        });
+        setError({ status: true, message: '' });
+        handleCloseAdd();
+    }
 
     return (
         <Modal
             className={styles.modal}
             open={open}
-            onClose={handleCloseAdd}
+            onClose={handleClose}
             closeAfterTransition
             BackdropComponent={Backdrop}
             BackdropProps={{
@@ -133,7 +147,7 @@ export default function ModalAdd(props) {
                                 startIcon={<Cancel />}
                                 color="secondary"
                                 style={{ marginRight: 10 }}
-                                onClick={() => handleCloseAdd()}
+                                onClick={() => handleClose()}
                             >
                                 <span>Cancel</span>
                             </Button>
