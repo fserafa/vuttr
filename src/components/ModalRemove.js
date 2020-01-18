@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { Modal, TextField, Backdrop, Fade, Box, Button, FormGroup, Typography, Card } from '@material-ui/core';
+import React from 'react'
+import { Modal, Backdrop, Fade, Box, Button, Typography } from '@material-ui/core';
 import { Delete, Cancel } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/core/styles';
 
@@ -41,6 +41,8 @@ export default function ModalRemove(props) {
                                 startIcon={<Cancel />}
                                 color="secondary"
                                 style={{ marginRight: 10 }}
+                                onClick={() => handleCloseRemove()}
+
                             >
                                 <span>Cancel</span>
                             </Button>

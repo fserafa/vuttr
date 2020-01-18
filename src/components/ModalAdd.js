@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Modal, TextField, Backdrop, Fade, Box, Button, FormGroup, Typography, Card } from '@material-ui/core';
+import { Modal, TextField, Backdrop, Fade, Box, Button, Typography } from '@material-ui/core';
 import { Add, Cancel } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/core/styles';
 
@@ -15,29 +15,52 @@ const useStyles = makeStyles({
 });
 
 export default function ModalAdd(props) {
-    const [name, setName] = useState('');
-    const [link, setLink] = useState('');
-    const [description, setDescription] = useState('');
-    const [tags, setTags] = useState([]);
+    const [tool, setTool] = useState({
+        name: '',
+        link: '',
+        description: '',
+        tags: ''
+    })
+    const [error, setError] = useState({
+        status: true,
+        message: ''
+    });
+    const [info, setInfo] = useState(null);
+
 
     const styles = useStyles();
     const { open, handleCloseAdd, handleAdd } = props;
 
+    function handleChange(field, value) {
+        if (field === 'link') {
+            if (!value.toLowerCase().startsWith('http')) {
+                setError({ status: true, message: 'Link must start with http or https' })
+            }
+            else {
+                setError({ status: false, message: '' })
+            }
+        }
+
+        setTool(tool => ({ ...tool, [field]: value }))
+    }
+
     function handleSubmit(e) {
-        e.preventDefault()
+        e.preventDefault();
 
-        let tool = {
-            name: name,
-            link: link,
-            description: description,
-            tags: tags.split(' ')
-        };
+        if (error.status) return;
 
-        handleAdd(tool);
-        setName('');
-        setLink('');
-        setDescription('');
-        setTags('');
+        const _tool = { ...tool };
+        _tool.tags = _tool.tags.split(' ');
+
+        setTool({
+            name: '',
+            link: '',
+            description: '',
+            tags: ''
+        });
+        setError({ status: true, message: '' });
+
+        handleAdd(_tool);
     }
 
     return (
@@ -62,37 +85,55 @@ export default function ModalAdd(props) {
                             size="medium"
                             variant="outlined"
                             label="Tool Name"
-                            onChange={e => setName(e.target.value)}
-                            value={name} />
+                            onChange={e => handleChange('name', e.target.value)}
+                            value={tool.name} />
                         <TextField
                             className={styles.input}
                             size="medium"
                             variant="outlined"
                             label="Tool Link"
-                            onChange={e => setLink(e.target.value)}
-                            value={link}
+                            onChange={e => handleChange('link', e.target.value)}
+                            value={tool.link}
+                            autoCapitalize='none'
+                            autoCorrect='false'
                         />
+
+                        {error.status &&
+                            <Box color='error.main' marginTop='-15px' marginBottom="10px">
+                                <Typography>{error.message}</Typography>
+                            </Box>}
+
                         <TextField
                             className={styles.input}
                             size="medium"
                             variant="outlined"
                             label="Tool Description"
-                            onChange={e => setDescription(e.target.value)}
-                            value={description}
+                            onChange={e => handleChange('description', e.target.value)}
+                            value={tool.description}
                         />
                         <TextField
                             className={styles.input}
                             size="medium"
                             variant="outlined"
                             label="Tags"
-                            onChange={e => setTags(e.target.value)}
-                            value={tags}
+                            onChange={e => handleChange('tags', e.target.value)}
+                            value={tool.tags}
+                            onFocus={() => setInfo('Write your tags without # and separated by space')}
+                            onBlur={() => setInfo(null)}
+                            autoCapitalize='none'
+                            autoCorrect='false'
                         />
+                        {info &&
+                            <Box color='info.main' marginTop='-15px' marginBottom="10px">
+                                <Typography>{info}</Typography>
+                            </Box>}
+
                         <Box display="flex" justifyContent="flex-end" mt="20px">
                             <Button
                                 startIcon={<Cancel />}
                                 color="secondary"
-                                style={{marginRight: 10}}
+                                style={{ marginRight: 10 }}
+                                onClick={() => handleCloseAdd()}
                             >
                                 <span>Cancel</span>
                             </Button>

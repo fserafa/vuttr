@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Typography, Card, Button, Box } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import Delete from '@material-ui/icons/Delete';
@@ -17,7 +17,7 @@ export default function Tool(props) {
     return (
         <Card className={styles.card}>
             <Box display="flex" justifyContent="space-between" alignItems="center" mb="20px">
-                <a href={tool.link}><Typography variant="h4">{tool.name}</Typography></a>
+                <a href={tool.link} target='_blank' rel='noopener noreferrer'><Typography variant="h4">{tool.name}</Typography></a>
                 <Button
                     onClick={() => handleOpenRemove(tool)}
                     variant="contained"

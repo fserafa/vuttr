@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Typography, Container, Box, Button, Input, TextField, CircularProgress, Grid, Checkbox, FormControlLabel, InputAdornment } from '@material-ui/core';
+import { Container, Box, Button, TextField, Grid, Checkbox, FormControlLabel, InputAdornment, Typography } from '@material-ui/core';
 import api from '../services/api';
 import Tool from '../components/Tool'
 import ModalAdd from '../components/ModalAdd';
 import { Search, Add } from '@material-ui/icons';
 import ModalRemove from '../components/ModalRemove';
+import Loading from '../components/Loading';
 
 
 
@@ -24,7 +25,7 @@ export default function Index() {
         async function getData() {
             setLoading(true);
             const response = await api.get('/tools');
-            setTools(response.data);
+            setTools(response.data.reverse());
             setLoading(false);
         }
 
@@ -36,18 +37,18 @@ export default function Index() {
     }, [tools])
 
     async function handleAdd(tool) {
-        setLoading(true);
-        await api.post(`/tools/`, tool);
-        setReload(reload => (!reload));
         handleCloseAdd();
+        setLoading(true);
+        await api.post(`/tools/`, tool); 
+        setReload(reload => (!reload));
         setLoading(false);
     }
 
     async function handleRemove(id) {
+        handleCloseRemove();
         setLoading(true);
         await api.delete(`/tools/${id}`);
         setReload(reload => (!reload));
-        handleCloseRemove();
         setLoading(false);
     }
 
@@ -88,22 +89,22 @@ export default function Index() {
 
     return (
         <Container style={{ display: 'flex', alignContent: 'center', justifyContent: 'center', flexDirection: 'column' }}>
-            <Typography variant="h3">VUTTR</Typography>
-            <Typography variant="h4">Very Useful Tools To Remember</Typography>
-            <Box display="flex" justifyContent="center">
-                {loading && <CircularProgress />}
-            </Box>
+
+
+            <Loading loading={loading} />
 
             <Box display='flex' justifyContent="space-between" mt="40px" mb="40px">
                 <Grid container spacing={1} alignItems="center">
                     <TextField
-                        label="Search"
+                        label="Search VUTTR"
                         onChange={e => handleSearch(e.target.value)}
                         InputProps={{
                             startAdornment: <InputAdornment position="start"><Search /></InputAdornment>
                         }}
                         variant="outlined"
                         style={{ marginRight: 10 }}
+                        autoCorrect='false'
+                        autoCapitalize='none'
                     />
                     <FormControlLabel
                         control={
@@ -128,6 +129,10 @@ export default function Index() {
 
             <ModalAdd open={openAdd} handleCloseAdd={handleCloseAdd} handleAdd={handleAdd} />
             <ModalRemove open={openRemove} handleCloseRemove={handleCloseRemove} tool={tool} handleRemove={handleRemove} />
+
+            {search && searchResults.length === 0 ? (
+                <Typography variant='h5'>No tools found</Typography>
+            ) : null}
 
             {!search ?
                 tools.map((item) => (
