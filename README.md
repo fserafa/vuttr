@@ -14,8 +14,8 @@ https://vuttr-react.herokuapp.com/
 
 1. [Set up React.](https://github.com/facebook/create-react-app)
 2. `cd` into this project directory
-3. Run `npm install`
-4. Run `npm start`
+3. Run `yarn install`
+4. Run `yarn start`
 
 ## Description
 
